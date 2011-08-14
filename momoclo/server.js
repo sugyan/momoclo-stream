@@ -41,6 +41,7 @@ io.sockets.on('connection', function (socket) {
     };
     setInterval(function () {
         var params = {
+            result_type: 'recent',
             rpp: 100,
             q: '#momoclo OR ももクロ OR ももいろクローバー OR 夏菜子 OR 玉井詩織 OR しおりん OR 佐々木彩夏 OR あーりん OR 有安 OR 杏果 OR 高城れに OR れにちゃん'
         };
