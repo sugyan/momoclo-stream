@@ -23,3 +23,9 @@ div.tweet span.date a:link, div.tweet span.date a:visited {
     font-size: small;
     color: gray;
 }
+
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+	body {
+		width: 640px;
+	}
+}
