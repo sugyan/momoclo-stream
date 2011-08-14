@@ -18,9 +18,6 @@ div.tweet div.image {
 div.tweet div.text {
     margin-left: 53px;
 }
-div.tweet span.user {
-    color: blue;
-}
 div.tweet span.date a:link, div.tweet span.date a:visited {
     margin-left: 5px;
     font-size: small;
