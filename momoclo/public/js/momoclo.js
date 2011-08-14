@@ -1,4 +1,8 @@
 $(function () {
+    // anywhere
+    twttr.anywhere(function (T) {
+        T.hovercards();
+    });
     // socket.io
     var socket = io.connect();
     socket.on('connection', function (count) {
