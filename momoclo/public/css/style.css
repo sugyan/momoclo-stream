@@ -25,7 +25,7 @@ div.tweet span.date a:link, div.tweet span.date a:visited {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 2) {
-	body {
-		width: 640px;
+	html {
+		width: 320px;
 	}
 }
