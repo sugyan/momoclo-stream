@@ -1,0 +1,29 @@
+body {
+    font-family: "Hiragino Maru Gothic ProN", Arial, "Helvetica Neue", sans-serif;
+}
+
+h1 {
+    
+}
+div.tweet {
+    border-bottom: 1px solid gray;
+    padding: 3px 0;
+}
+div.tweet a {
+    text-decoration: none;
+}
+div.tweet div.image {
+    float: left;
+    height: 48px;
+}
+div.tweet div.text {
+    margin-left: 53px;
+}
+div.tweet span.user {
+    color: blue;
+}
+div.tweet span.date a:link, div.tweet span.date a:visited {
+    margin-left: 5px;
+    font-size: small;
+    color: gray;
+}

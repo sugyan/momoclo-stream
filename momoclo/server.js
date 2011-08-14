@@ -1,0 +1,107 @@
+var http = require('http');
+var qs = require('querystring');
+var express = require('express');
+var app = express.createServer();
+
+app.configure(function () {
+    app.set('view engine', 'jade');
+    app.use(express['static'](__dirname + '/public'));
+});
+app.get('/', function (req, res) {
+    res.render('index');
+});
+app.listen(8080);
+
+var io = require('socket.io').listen(app);
+io.set('transports', ['xhr-polling']);
+io.sockets.on('connection', function (socket) {
+    io.sockets.emit('connection', io.of().clients().length);
+    socket.on('disconnect', function () {
+        process.nextTick(function () {
+            io.sockets.emit('connection', io.of().clients().length);
+        });
+    });
+});
+
+(function () {
+    var max_id_str;
+    var search = function (params, callback) {
+        http.get({
+            host: 'search.twitter.com',
+            path: '/search.json?' + qs.stringify(params)
+        }, function (res) {
+            var data = '';
+            res.on('data', function (chunk) {
+                data += chunk;
+            });
+            res.on('end', function () {
+                callback(data);
+            });
+        });
+    };
+    setInterval(function () {
+        var params = {
+            rpp: 100,
+            q: '#momoclo OR ももクロ OR ももいろクローバー OR 夏菜子 OR 玉井詩織 OR しおりん OR 佐々木彩夏 OR あーりん OR 有安 OR 杏果 OR 高城れに OR れにちゃん'
+        };
+        if (max_id_str) {
+            params.since_id = max_id_str;
+        }
+        search(params, function (data) {
+            var i, base_date, tweet, timeout;
+            var obj = JSON.parse(data);
+            var push = function (tweet) {
+                io.sockets.emit('tweet', {
+                    id: tweet.id_str,
+                    date: Date.parse(tweet.created_at),
+                    user: tweet.from_user,
+                    text: tweet.text,
+                    icon: tweet.profile_image_url
+                });
+            };
+            tweet = obj.results.pop();
+            if (tweet) {
+                // delay?
+                base_date = max_id_str ? Date.parse(tweet.created_at) : new Date().getTime();
+                push(tweet);
+                for (i = obj.results.length; i--;) {
+                    tweet = obj.results[i];
+                    timeout = Date.parse(tweet.created_at) - base_date;
+                    setTimeout(push, timeout, tweet);
+                }
+            }
+            max_id_str = obj.max_id_str;
+        });
+    }, 5000);
+}());
+
+// for nginx + socket.io >=0.7
+// https://github.com/learnboost/socket.io/issues/301
+// http://d.hatena.ne.jp/sugyan/20110803/1312368491
+(function () {
+    var path = require('path');
+    var HTTPPolling = require(path.join(path.dirname(require.resolve('socket.io')), 'lib', 'transports', 'http-polling'));
+    var XHRPolling  = require(path.join(path.dirname(require.resolve('socket.io')), 'lib', 'transports', 'xhr-polling'));
+    XHRPolling.prototype.doWrite = function (data) {
+        HTTPPolling.prototype.doWrite.call(this);
+        
+        var origin = this.req.headers.origin,
+        headers = {
+            'Content-Type': 'text/plain; charset=UTF-8',
+            'Content-Length': data === undefined ? 0 : Buffer.byteLength(data)
+        };
+        
+        if (origin) {
+            // https://developer.mozilla.org/En/HTTP_Access_Control
+            headers['Access-Control-Allow-Origin'] = '*';
+            if (this.req.headers.cookie) {
+                headers['Access-Control-Allow-Credentials'] = 'true';
+            }
+        }
+        
+        this.response.writeHead(200, headers);
+        this.response.write(data);
+        this.log.debug(this.name + ' writing', data);
+    };
+}());
+

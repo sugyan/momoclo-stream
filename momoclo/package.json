@@ -1,0 +1,9 @@
+{
+    "name": "momoclo",
+    "version": "0.0.1",
+    "dependencies": {
+        "socket.io": ">=0.7.9",
+        "express": ">=2.4.4",
+        "jade": ">=0.14.0"
+    }
+}
