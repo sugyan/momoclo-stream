@@ -1,3 +1,5 @@
 www:
   type: nodejs
   approot: momoclo
+mongo:
+  type: mongodb

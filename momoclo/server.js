@@ -7,6 +7,12 @@ app.configure(function () {
     app.set('view engine', 'jade');
     app.use(express['static'](__dirname + '/public'));
 });
+app.configure('production', function () {
+    console.log('production');
+});
+app.configure('development', function () {
+    console.log('development');
+});
 app.get('/', function (req, res) {
     res.render('index');
 });
