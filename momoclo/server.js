@@ -1,35 +1,45 @@
 var http = require('http');
 var qs = require('querystring');
+var mongodb = require('mongodb');
 var express = require('express');
 var app = express.createServer();
+var config = require('./config/default');
 
 app.configure(function () {
     app.set('view engine', 'jade');
     app.use(express['static'](__dirname + '/public'));
 });
 app.configure('production', function () {
-    console.log('production');
-});
-app.configure('development', function () {
-    console.log('development');
+    var production = require('./config/production');
+    Object.keys(production).forEach(function (key) {
+        config[key] = production[key];
+    });
 });
 app.get('/', function (req, res) {
     res.render('index');
 });
 app.listen(8080);
 
-var io = require('socket.io').listen(app);
-io.set('transports', ['xhr-polling']);
-io.sockets.on('connection', function (socket) {
-    io.sockets.emit('connection', io.of().clients().length);
-    socket.on('disconnect', function () {
-        process.nextTick(function () {
-            io.sockets.emit('connection', io.of().clients().length);
-        });
+var db = new mongodb.Db(config.mongodb.dbname, new mongodb.Server(
+    config.mongodb.server.host,
+    config.mongodb.server.port,
+    config.mongodb.server.opts
+));
+var collection = function (name, callback) {
+    db.open(function (err, db) {
+        if (err) { throw err; }
+        db.authenticate(
+            config.mongodb.auth.username,
+            config.mongodb.auth.password,
+            function (err, result) {
+                if (err) { throw err; }
+                db.collection(name, callback);
+            }
+        );
     });
-});
-
-(function () {
+};
+collection('tweet', function (err, collection) {
+    if (err) { throw err; }
     var max_id_str;
     var search = function (params, callback) {
         http.get({
@@ -54,33 +64,56 @@ io.sockets.on('connection', function (socket) {
         if (max_id_str) {
             params.since_id = max_id_str;
         }
-        search(params, function (data) {
+        search(params, function (json) {
             var i, base_date, tweet, timeout;
-            var obj = JSON.parse(data);
-            var push = function (tweet) {
-                io.sockets.emit('tweet', {
-                    id: tweet.id_str,
-                    date: Date.parse(tweet.created_at),
-                    user: tweet.from_user,
-                    text: tweet.text,
-                    icon: tweet.profile_image_url
-                });
-            };
-            tweet = obj.results.pop();
-            if (tweet) {
-                // delay?
-                base_date = max_id_str ? Date.parse(tweet.created_at) : new Date().getTime();
-                push(tweet);
-                for (i = obj.results.length; i--;) {
-                    tweet = obj.results[i];
-                    timeout = Date.parse(tweet.created_at) - base_date;
-                    setTimeout(push, timeout, tweet);
+            try {
+                var obj = JSON.parse(json);
+                var push = function (tweet) {
+                    var data = {
+                        id: tweet.id_str,
+                        date: new Date(tweet.created_at),
+                        user: tweet.from_user,
+                        text: tweet.text,
+                        icon: tweet.profile_image_url
+                    };
+                    collection.insert(data);
+                    io.sockets.emit('tweet', data);
+                };
+                tweet = obj.results.pop();
+                if (tweet) {
+                    // delay?
+                    base_date = max_id_str ? Date.parse(tweet.created_at) : new Date().getTime();
+                    push(tweet);
+                    for (i = obj.results.length; i--;) {
+                        tweet = obj.results[i];
+                        timeout = Date.parse(tweet.created_at) - base_date;
+                        setTimeout(push, timeout, tweet);
+                    }
                 }
+                max_id_str = obj.max_id_str;
+            } catch (e) {
+                console.error(e);
             }
-            max_id_str = obj.max_id_str;
         });
     }, 5000);
-}());
+
+    var io = require('socket.io').listen(app);
+    io.set('transports', ['xhr-polling']);
+    io.sockets.on('connection', function (socket) {
+        collection.find().sort({ date: -1 }).limit(30).toArray(function (err, results) {
+            var i;
+            for (i = results.length; i--;) {
+                socket.emit('tweet', results[i]);
+            }
+        });
+        io.sockets.emit('connection', io.of().clients().length);
+        socket.on('disconnect', function () {
+            process.nextTick(function () {
+                io.sockets.emit('connection', io.of().clients().length);
+            });
+        });
+    });
+});
 
 // for nginx + socket.io >=0.7
 // https://github.com/learnboost/socket.io/issues/301
@@ -111,4 +144,3 @@ io.sockets.on('connection', function (socket) {
         this.log.debug(this.name + ' writing', data);
     };
 }());
-

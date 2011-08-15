@@ -4,6 +4,7 @@
     "dependencies": {
         "socket.io": ">=0.7.9",
         "express": ">=2.4.4",
-        "jade": ">=0.14.0"
+        "jade": ">=0.14.1",
+        "mongodb": ">=0.9.6"
     }
 }
