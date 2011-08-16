@@ -27,4 +27,7 @@ $(function () {
             $('a.twitter-anywhere-user').attr({ target: '_blank' });
         });
     });
+    twttr.anywhere(function (T) {
+        T("#footer").hovercards();
+    });
 });

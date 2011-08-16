@@ -3,6 +3,7 @@ body {
 }
 h1 {
     margin: 5px 0;
+    color: #F63F6F;
 }
 div.tweet {
     border-bottom: 1px solid gray;
@@ -15,6 +16,10 @@ div.tweet div.image {
     float: left;
     height: 48px;
 }
+div.tweet div.image img {
+    height: 48px;
+    width: 48px;
+}
 div.tweet div.text {
     margin-left: 53px;
 }
@@ -22,6 +27,10 @@ div.tweet span.date a:link, div.tweet span.date a:visited {
     margin-left: 5px;
     font-size: small;
     color: gray;
+}
+div#footer {
+    font-size: small;
+    text-align: right;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 2) {
