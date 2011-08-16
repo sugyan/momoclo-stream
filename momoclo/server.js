@@ -65,44 +65,53 @@ collection('tweet', function (err, collection) {
             params.since_id = max_id_str;
         }
         search(params, function (json) {
-            var i, base_date, tweet, timeout;
+            var i, obj, base_date, tweet, timeout;
             try {
-                var obj = JSON.parse(json);
-                var push = function (tweet) {
-                    var data = {
-                        id: tweet.id_str,
-                        date: new Date(tweet.created_at),
-                        user: tweet.from_user,
-                        text: tweet.text,
-                        icon: tweet.profile_image_url
-                    };
-                    collection.insert(data);
-                    io.sockets.emit('tweet', data);
-                };
-                tweet = obj.results.pop();
-                if (tweet) {
-                    // delay?
-                    base_date = max_id_str ? Date.parse(tweet.created_at) : new Date().getTime();
-                    push(tweet);
-                    for (i = obj.results.length; i--;) {
-                        tweet = obj.results[i];
-                        timeout = Date.parse(tweet.created_at) - base_date;
-                        setTimeout(push, timeout, tweet);
-                    }
-                }
-                max_id_str = obj.max_id_str;
+                obj = JSON.parse(json);
             } catch (e) {
                 console.error(e);
+                return;
             }
+            var push = function (tweet) {
+                var data = {
+                    id: tweet.id_str,
+                    date: new Date(tweet.created_at),
+                    user: tweet.from_user,
+                    user_id: tweet.from_user_id_str,
+                    text: tweet.text,
+                    icon: tweet.profile_image_url
+                };
+                collection.findOne({ id: data.id }, function (err, result) {
+                    if (err) { throw err; }
+                    if (result) { return; }
+                    collection.insert(data, function (err, results) {
+                        if (err) { throw err; }
+                        delete results[0]._id;
+                        io.sockets.emit('tweet', results[0]);
+                    });
+                });
+            };
+            tweet = obj.results.pop();
+            if (tweet) {
+                // delay
+                base_date = max_id_str ? Date.parse(tweet.created_at) : new Date().getTime();
+                push(tweet);
+                for (i = obj.results.length; i--;) {
+                    tweet = obj.results[i];
+                    timeout = Date.parse(tweet.created_at) - base_date;
+                    setTimeout(push, timeout, tweet);
+                }
+            }
+            max_id_str = obj.max_id_str;
         });
     }, 5000);
 
     var io = require('socket.io').listen(app);
     io.set('transports', ['xhr-polling']);
     io.sockets.on('connection', function (socket) {
-        collection.find().sort({ date: -1 }).limit(30).toArray(function (err, results) {
-            var i;
+        collection.find().sort({ date: -1 }).limit(30).toArray(function (err, results, i) {
             for (i = results.length; i--;) {
+                delete results[i]._id;
                 socket.emit('tweet', results[i]);
             }
         });
