@@ -38,3 +38,7 @@ div#footer {
 		width: 320px;
 	}
 }
+
+/* clearfix */
+.group, .tweet { *zoom: 1; } /* for ie6/7 */
+.group:after, .tweet:after { content: ""; display: block; clear: both; }
