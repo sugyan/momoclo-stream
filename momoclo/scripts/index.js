@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var config = require('../config/default');
+var config = require('../config/production');
 var mongodb = require('mongodb');
 var db = new mongodb.Db(config.mongodb.dbname, new mongodb.Server(
     config.mongodb.server.host,
