@@ -2,8 +2,11 @@ body {
     font-family: "Hiragino Maru Gothic ProN", Arial, "Helvetica Neue", sans-serif;
 }
 h1 {
-    margin: 5px 0;
+    margin: 0;
+}
+h1 a:link, h1 a:visited {
     color: #F63F6F;
+    text-decoration: none;
 }
 div.tweet {
     border-bottom: 1px solid gray;
