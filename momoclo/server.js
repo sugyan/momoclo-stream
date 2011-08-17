@@ -87,6 +87,7 @@ collection('tweet', function (err, collection) {
                     collection.insert(data, function (err, results) {
                         if (err) { throw err; }
                         delete results[0]._id;
+                        results[0].date = Date.parse(results[0].date);
                         io.sockets.emit('tweet', results[0]);
                     });
                 });
@@ -112,6 +113,7 @@ collection('tweet', function (err, collection) {
         collection.find().sort({ date: -1 }).limit(30).toArray(function (err, results, i) {
             for (i = results.length; i--;) {
                 delete results[i]._id;
+                results[i].date = Date.parse(results[i].date);
                 socket.emit('tweet', results[i]);
             }
         });
