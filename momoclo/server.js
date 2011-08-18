@@ -110,7 +110,7 @@ collection('tweet', function (err, collection) {
     var io = require('socket.io').listen(app);
     io.set('transports', ['xhr-polling']);
     io.sockets.on('connection', function (socket) {
-        collection.find().sort({ date: -1 }).limit(30).toArray(function (err, results, i) {
+        collection.find().sort({ date: -1 }).limit(50).toArray(function (err, results, i) {
             for (i = results.length; i--;) {
                 delete results[i]._id;
                 results[i].date = Date.parse(results[i].date);
