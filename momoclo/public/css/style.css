@@ -8,6 +8,12 @@ h1 a:link, h1 a:visited {
     color: #F63F6F;
     text-decoration: none;
 }
+div#filters {
+    background-color: #99E;
+}
+div#filters input {
+    margin-left: 12.5px;
+}
 div.tweet {
     border-bottom: 1px solid gray;
     padding: 3px 0;

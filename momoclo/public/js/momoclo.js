@@ -1,4 +1,36 @@
 $(function () {
+    var filter;
+    // anywhere
+    twttr.anywhere(function (T) {
+        T("#footer").hovercards();
+    });
+    // filtering
+    var filtering = function (text) {
+        if (! filter) {
+            return false;
+        }
+        return filter.test(text);
+    };
+    (function () {
+        var updateFilter = function () {
+            var reStr = $('#filters input:checked').map(function (i, e) {
+                return $(e).val();
+            }).toArray().join('|');
+            filter = reStr ? new RegExp(reStr, 'm') : null;
+        };
+        $('#filters input').change(function () {
+            updateFilter();
+            $('.tweet').each(function (i, e) {
+                var tweet = $(e);
+                if (filtering(tweet.find('div').last().text())) {
+                    tweet.slideDown();
+                } else {
+                    tweet.slideUp();
+                }
+            });
+        });
+        updateFilter();
+    }());
     // socket.io
     var socket = io.connect();
     socket.on('connection', function (count) {
@@ -20,14 +52,13 @@ $(function () {
                     .append($('<div>')
                             .append($('<span>').html(data.text))));
         $('#tweets').prepend(tweet);
-        tweet.slideDown();
+        if (filtering(data.text)) {
+            tweet.slideDown();
+        }
         // anywhere
         twttr.anywhere(function (T) {
             T("#" + data.id).linkifyUsers();
             $('a.twitter-anywhere-user').attr({ target: '_blank' });
         });
-    });
-    twttr.anywhere(function (T) {
-        T("#footer").hovercards();
     });
 });
