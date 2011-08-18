@@ -59,7 +59,7 @@ collection('tweet', function (err, collection) {
         var params = {
             result_type: 'recent',
             rpp: 100,
-            q: '#momoclo OR ももクロ OR ももいろクローバー OR 夏菜子 OR 玉井詩織 OR しおりん OR 佐々木彩夏 OR あーりん OR 有安 OR 杏果 OR 高城れに OR れにちゃん'
+            q: '#momoclo OR ももクロ OR ももいろクローバー OR 夏菜子 OR 玉井詩織 OR しおりん OR 佐々木彩夏 OR あーりん OR 杏果 OR 高城れに OR れにちゃん'
         };
         if (max_id_str) {
             params.since_id = max_id_str;
