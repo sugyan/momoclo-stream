@@ -1,5 +1,5 @@
 {
-    "name": "momoclo stream",
+    "name": "momoclo-stream",
     "version": "0.0.2",
     "dependencies": {
         "socket.io": ">=0.8.3",
