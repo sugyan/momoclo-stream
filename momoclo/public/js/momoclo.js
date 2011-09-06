@@ -55,6 +55,10 @@ $(function () {
         if (filtering(data.text)) {
             tweet.slideDown();
         }
+        while ($('.tweet').length > 100) {
+            $('.tweet').last().slideUp().remove();
+        }
+
         // anywhere
         twttr.anywhere(function (T) {
             T("#" + data.id).linkifyUsers();
