@@ -37,7 +37,7 @@ $(function () {
         $('#connections').text(count + ' connections');
     });
     socket.on('tweet', function (data) {
-        data.text = data.text.replace(/(http:\/\/t\.co\/\w{7})/g, '<a href="$1" target="_blank">$1</a>');
+        data.text = data.text.replace(/(http:\/\/t\.co\/\w{7,8})/g, '<a href="$1" target="_blank">$1</a>');
         var tweet = $('<div>').attr({ id: data.id }).addClass('tweet').hide()
             .append($('<div>').addClass('image')
                     .append($('<img>').attr({ src: data.icon })))
