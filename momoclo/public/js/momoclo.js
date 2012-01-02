@@ -38,15 +38,31 @@ $(function () {
     });
 
     socket.on('ustream', function (data) {
-        window.webkitNotifications.createNotification(
-            data.imageUrl.small,
-            data.title,
-            data.title+'が'+data.status+'になりました'
-        ).show();
+        if (window.webkitNotifications) {
+            window.webkitNotifications.createNotification(
+                data.imageUrl.small,
+                data.title,
+                data.title+'が'+data.status+'になりました'
+            ).show();
+        }
     });
     $('#notification').click(function(){
-        if (window.webkitNotifications.checkPermission() != 0) {
-            window.webkitNotifications.requestPermission();
+        if (window.webkitNotifications) {
+            if (window.webkitNotifications.checkPermission() != 0) {
+                window.webkitNotifications.requestPermission();
+            } else {
+                var n = window.webkitNotifications.createNotification(
+                    null,
+                    'momoclo stream',
+                    '通知は有効です'
+                );
+                n.show();
+                setTimeout(function(){
+                    n.cancel();
+                }, 5000);
+            }
+        } else {
+            alert('お使いのブラウザはサポートされていません。通知機能はGoogle Chromeのみでご利用頂けます。');
         }
     });
 
