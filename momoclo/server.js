@@ -136,19 +136,14 @@ collection('tweet', function (err, collection) {
                 data += chunk;
             });
             res.on('end', function () {
-             var response = JSON.parse(data);
+                var response = JSON.parse(data);
                 if (response.results.status != 'offline' && status != response.results.status) {
                     io.sockets.emit('ustream', response.results);
-                    status = response.results.status;
                 }
+                status = response.results.status;
             });
         });
     }, 30000);
-
-    var items = require('./momoclo/config/rss');
-    rss.setup(items, function(info) {
-        io.sockets.emit('ustream', info);
-    });    
 });
 
 // for nginx + socket.io >=0.7
