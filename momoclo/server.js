@@ -124,6 +124,26 @@ collection('tweet', function (err, collection) {
             });
         });
     });
+    
+    setInterval(function () {
+        var status = null;
+        http.get({
+            host: 'api.ustream.tv',
+            path: '/json/channel/momoclotv/getInfo?key=' + config.ustream.auth.key
+        }, function (res) {
+            var data = '';
+            res.on('data', function (chunk) {
+                data += chunk;
+            });
+            res.on('end', function () {
+                var response = JSON.parse(data);
+                if (response.results.status != 'offline' && status != response.results.status) {
+                    io.sockets.emit('ustream', response.results);
+                }
+                status = response.results.status;
+            });
+        });
+    }, 30000);
 });
 
 // for nginx + socket.io >=0.7

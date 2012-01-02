@@ -36,6 +36,36 @@ $(function () {
     socket.on('connection', function (count) {
         $('#connections').text(count + ' connections');
     });
+
+    socket.on('ustream', function (data) {
+        if (window.webkitNotifications) {
+            window.webkitNotifications.createNotification(
+                data.imageUrl.small,
+                data.title,
+                data.title+'が'+data.status+'になりました'
+            ).show();
+        }
+    });
+    $('#notification').click(function(){
+        if (window.webkitNotifications) {
+            if (window.webkitNotifications.checkPermission() != 0) {
+                window.webkitNotifications.requestPermission();
+            } else {
+                var n = window.webkitNotifications.createNotification(
+                    null,
+                    'momoclo stream',
+                    '通知は有効です'
+                );
+                n.show();
+                setTimeout(function(){
+                    n.cancel();
+                }, 5000);
+            }
+        } else {
+            alert('お使いのブラウザはサポートされていません。通知機能はGoogle Chromeのみでご利用頂けます。');
+        }
+    });
+
     socket.on('tweet', function (data) {
         data.text = data.text.replace(/(http:\/\/t\.co\/\w{7,8})/g, '<a href="$1" target="_blank">$1</a>');
         var tweet = $('<div>').attr({ id: data.id }).addClass('tweet').hide()
