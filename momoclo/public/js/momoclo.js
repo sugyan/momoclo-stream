@@ -36,6 +36,20 @@ $(function () {
     socket.on('connection', function (count) {
         $('#connections').text(count + ' connections');
     });
+
+    socket.on('ustream', function (data) {
+        window.webkitNotifications.createNotification(
+            'http://www.momoclo.net/img/main2.jpg', 
+            'momoclotv', 
+            'momoclotvが'+data.status+'になりました'
+        ).show();
+    });
+    $('#notification').click(function(){
+        if (window.webkitNotifications.checkPermission() != 0) {
+            window.webkitNotifications.requestPermission();
+        }
+    });
+
     socket.on('tweet', function (data) {
         data.text = data.text.replace(/(http:\/\/t\.co\/\w{7,8})/g, '<a href="$1" target="_blank">$1</a>');
         var tweet = $('<div>').attr({ id: data.id }).addClass('tweet').hide()
