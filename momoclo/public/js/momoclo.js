@@ -39,9 +39,9 @@ $(function () {
 
     socket.on('ustream', function (data) {
         window.webkitNotifications.createNotification(
-            'http://www.momoclo.net/img/main2.jpg', 
-            'momoclotv', 
-            'momoclotvが'+data.status+'になりました'
+            data.imageUrl.small,
+            data.title,
+            data.title+'が'+data.status+'になりました'
         ).show();
     });
     $('#notification').click(function(){
