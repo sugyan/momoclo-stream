@@ -10,12 +10,6 @@ app.configure(function () {
     app.set('view engine', 'jade');
     app.use(express['static'](__dirname + '/public'));
 });
-app.configure('production', function () {
-    var production = require('./config/production');
-    Object.keys(production).forEach(function (key) {
-        config[key] = production[key];
-    });
-});
 app.get('/', function (req, res) {
     res.render('index');
 });
