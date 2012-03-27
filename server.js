@@ -1,5 +1,6 @@
-var http = require('http');
-var qs = require('querystring');
+var qs      = require('querystring');
+var url     = require('url');
+var http    = require('http');
 var mongodb = require('mongodb');
 var express = require('express');
 var app = express.createServer();
@@ -21,17 +22,18 @@ app.get('/', function (req, res) {
 app.listen(process.env.PORT);
 console.log("server listening on port %d in %s mode", app.address().port, app.settings.env);
 
-var db = new mongodb.Db(config.mongodb.dbname, new mongodb.Server(
-    config.mongodb.server.host,
-    config.mongodb.server.port,
-    config.mongodb.server.opts
+var parsed = url.parsed(process.env.MONGOHQ_URL);
+var db = new mongodb.Db(parsed.pathname.substr(1), new mongodb.Server(
+    parsed.hostname,
+    parsed.port
 ));
 var collection = function (name, callback) {
     db.open(function (err, db) {
         if (err) { throw err; }
+        var auths = parsed.auth;
         db.authenticate(
-            config.mongodb.auth.username,
-            config.mongodb.auth.password,
+            auths[0],
+            auths[1],
             function (err, result) {
                 if (err) { throw err; }
                 db.collection(name, callback);
