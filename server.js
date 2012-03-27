@@ -23,6 +23,7 @@ app.listen(process.env.PORT);
 console.log("server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 var parsed = url.parse(process.env.MONGOHQ_URL);
+console.log(parsed);
 var db = new mongodb.Db(parsed.pathname.substr(1), new mongodb.Server(
     parsed.hostname,
     parsed.port
