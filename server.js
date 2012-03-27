@@ -126,33 +126,3 @@ collection('tweet', function (err, collection) {
         });
     });
 });
-
-// for nginx + socket.io >=0.7
-// https://github.com/learnboost/socket.io/issues/301
-// http://d.hatena.ne.jp/sugyan/20110803/1312368491
-(function () {
-    var path = require('path');
-    var HTTPPolling = require(path.join(path.dirname(require.resolve('socket.io')), 'lib', 'transports', 'http-polling'));
-    var XHRPolling  = require(path.join(path.dirname(require.resolve('socket.io')), 'lib', 'transports', 'xhr-polling'));
-    XHRPolling.prototype.doWrite = function (data) {
-        HTTPPolling.prototype.doWrite.call(this);
-        
-        var origin = this.req.headers.origin,
-        headers = {
-            'Content-Type': 'text/plain; charset=UTF-8',
-            'Content-Length': data === undefined ? 0 : Buffer.byteLength(data)
-        };
-        
-        if (origin) {
-            // https://developer.mozilla.org/En/HTTP_Access_Control
-            headers['Access-Control-Allow-Origin'] = '*';
-            if (this.req.headers.cookie) {
-                headers['Access-Control-Allow-Credentials'] = 'true';
-            }
-        }
-        
-        this.response.writeHead(200, headers);
-        this.response.write(data);
-        this.log.debug(this.name + ' writing', data);
-    };
-}());
