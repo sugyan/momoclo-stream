@@ -18,7 +18,8 @@ app.configure('production', function () {
 app.get('/', function (req, res) {
     res.render('index');
 });
-app.listen(8080);
+app.listen(process.NODE_ENV);
+console.log("server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 var db = new mongodb.Db(config.mongodb.dbname, new mongodb.Server(
     config.mongodb.server.host,
