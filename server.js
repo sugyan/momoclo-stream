@@ -22,7 +22,7 @@ app.get('/', function (req, res) {
 app.listen(process.env.PORT);
 console.log("server listening on port %d in %s mode", app.address().port, app.settings.env);
 
-var parsed = url.parsed(process.env.MONGOHQ_URL);
+var parsed = url.parse(process.env.MONGOHQ_URL);
 var db = new mongodb.Db(parsed.pathname.substr(1), new mongodb.Server(
     parsed.hostname,
     parsed.port
