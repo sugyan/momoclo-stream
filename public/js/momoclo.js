@@ -33,9 +33,6 @@ $(function () {
     }());
     // socket.io
     var socket = io.connect();
-    socket.on('connection', function (count) {
-        console.log(count);
-    });
     socket.on('tweet', function (data) {
         data.text = data.text.replace(/(http:\/\/t\.co\/\w{7,8})/g, '<a href="$1" target="_blank">$1</a>');
         var tweet = $('<div>').attr({ id: data.id }).addClass('tweet').hide()

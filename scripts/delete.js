@@ -16,7 +16,7 @@ db.open(function (err, db) {
         function (err, result) {
             if (err) { throw err; }
             db.collection('tweet', function (err, collection) {
-                collection.remove({ date: { $lt: new Date(new Date() - 10 * 60 * 1000) } }, function (err) {
+                collection.remove({ date: { $lt: new Date(new Date() - 24 * 60 * 60 * 1000) } }, function (err) {
                     if (err) { throw err; }
                     console.log('ok');
                     db.close();
