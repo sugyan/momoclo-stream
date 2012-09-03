@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "express": ">=3.0.0rc4",
+    "express-partials": ">=0.0.5",
     "hjs": ">=0.0.4"
   }
 }
