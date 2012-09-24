@@ -2,6 +2,6 @@
  * GET home page.
  */
 
-exports.index = function(req, res){
-  res.render('index', { title: 'momoclo stream' });
+exports.index = function (req, res) {
+    res.render('index', { title: 'momoclo stream' });
 };
